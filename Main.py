@@ -12,12 +12,15 @@ counter = 1
 # and number of unutilized abstractions present in all the god components found over all repos? I want to check,
 # e.g. whether the high correlation between god component and imperative abstraction can actually be explained
 # through a high percentage of imperative abstractions or not?
-FileUtil.writeFile(os.path.join(OUT_FILE_PATH, "smellsInfo1.csv"), "Project,Namespace,God Component,Unutilized Abstraction, Imperative Abstraction")
-
+#FileUtil.writeFile(os.path.join(OUT_FILE_PATH, "smellsInfo1.csv"), "Project,Namespace,God Component,Unutilized Abstraction, Imperative Abstraction")
+#Implementation smell	Namespace	Class
+FileUtil.writeFile(os.path.join(OUT_FILE_PATH, "smellsInfo2.csv"), "Project,Namespace,Type,Imperative Abstraction,Long Method,Complex Method")
 
 for dir in os.listdir(RESULT_ROOT_IN):
     if os.path.isdir(os.path.join(RESULT_ROOT_IN, dir)):
         print("Analyzing repo " + str(counter) + ": " + str(dir) + "\n")
         counter += 1
         #Case 1
-        SmellExtract.extractSmellInfo(RESULT_ROOT_IN, dir, os.path.join(OUT_FILE_PATH, "smellsInfo1.csv"))
+        #SmellExtract.extractSmellInfo(RESULT_ROOT_IN, dir, os.path.join(OUT_FILE_PATH, "smellsInfo1.csv"))
+        #Case 2
+        SmellExtract.extractSmellInfo2(RESULT_ROOT_IN, dir, os.path.join(OUT_FILE_PATH, "smellsInfo2.csv"))

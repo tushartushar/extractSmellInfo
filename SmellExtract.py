@@ -56,3 +56,33 @@ def extractSmellInfo(RESULT_ROOT_IN, dir, OUT_FILE_PATH):
         for file in files:
             if file.endswith("_ArchSmells.csv"):
                 process_case1(file, root, OUT_FILE_PATH)
+
+
+def process_case2(ds_file, dir_in, out_file_path):
+    project, *rest = ds_file.split("_DesignSmells.csv")
+    if os.path.isfile(os.path.join(dir_in, project + "_ImpSmells.csv")):
+        is_file = os.path.join(dir_in, project + "_ImpSmells.csv")
+        with open (os.path.join(dir_in, ds_file)) as asf:
+            for line in asf:
+                smell,namespace,dclass, *rest = line.split(",")
+                if (smell=='Imperative Abstraction'):
+                    long_m = 0
+                    comp_m = 0
+                    with open(is_file) as dsf:
+                        for ds_line in dsf:
+                            ismell,inamespace,iclass,*drest = ds_line.split(",")
+                            if namespace == inamespace:
+                                if dclass == iclass:
+                                    if ismell == "Long Method":
+                                        long_m += 1
+                                    if ismell == "Complex Method":
+                                        comp_m += 1
+                    FileUtil.writeFile(out_file_path, project + "," + namespace + "," + dclass + ",1," + str(long_m) + "," + str(comp_m))
+
+def extractSmellInfo2(RESULT_ROOT_IN, dir, OUT_FILE_PATH):
+    for root, dirs, files in os.walk(os.path.join(RESULT_ROOT_IN, dir)):
+        files = [f for f in files if not f[0] == '.']
+        dirs[:] = [d for d in dirs if not d[0] == '.']
+        for file in files:
+            if file.endswith("_DesignSmells.csv"):
+                process_case2(file, root, OUT_FILE_PATH)
