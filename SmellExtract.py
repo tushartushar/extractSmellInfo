@@ -86,3 +86,41 @@ def extractSmellInfo2(RESULT_ROOT_IN, dir, OUT_FILE_PATH):
         for file in files:
             if file.endswith("_DesignSmells.csv"):
                 process_case2(file, root, OUT_FILE_PATH)
+
+#"Project,Namespace,God Component,NO of classes,LOC,Insufficient Modularization")
+def extractSmellInfo3(RESULT_ROOT_IN, dir, OUT_FILE_PATH):
+    for root, dirs, files in os.walk(os.path.join(RESULT_ROOT_IN, dir)):
+        files = [f for f in files if not f[0] == '.']
+        dirs[:] = [d for d in dirs if not d[0] == '.']
+        for file in files:
+            if file.endswith("_ArchSmells.csv"):
+                process_case3(file, root, OUT_FILE_PATH)
+
+def process_case3(as_file, dir_in, out_file_path):
+    project, *rest = as_file.split("_ArchSmells.csv")
+    if os.path.isfile(os.path.join(dir_in, project + "_DesignSmells.csv")):
+        ds_file = os.path.join(dir_in, project + "_DesignSmells.csv")
+        with open (os.path.join(dir_in, as_file)) as asf:
+            for line in asf:
+                smell,aproject,namespace,cause, *rest = line.split(",")
+                if (smell=='God Component'):
+                    reason = ""
+                    reason_class = True
+                    for m in re.finditer(r'component are: (\d+)', cause, re.IGNORECASE):
+                        reason = m.group(1)
+                        reason_class = True
+                    if reason == "":
+                        for m in re.finditer(r'LOC of the component: (\d+)', cause, re.IGNORECASE):
+                            reason = m.group(1)
+                            reason_class = False
+                    insuff_abs = 0
+                    with open(ds_file) as dsf:
+                        for ds_line in dsf:
+                            dsmell,dnamespace,*drest = ds_line.split(",")
+                            if namespace == dnamespace:
+                                if dsmell == "Insufficient Modularization":
+                                    insuff_abs += 1
+                    if reason_class:
+                        FileUtil.writeFile(out_file_path, aproject + "," + namespace + ",1," + str(reason) + ",," + str(insuff_abs))
+                    else:
+                        FileUtil.writeFile(out_file_path, aproject + "," + namespace + ",1,," + str(reason) + "," + str(insuff_abs))
